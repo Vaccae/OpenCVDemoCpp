@@ -1,6 +1,8 @@
 # OpenCVDemoCpp
 使用C++编写的OpenCV的一些练习应用Demo，IDE使用的VS2019，OpenCV版本号为4.5.1
  
+ ### [2021-05-21 OpenCVSIFTBFMDemo项目为OpenCV4.5版本SIFT特征提取及匹配](https://mp.weixin.qq.com/s/PU_fBawsG1Nfg74F5Pc0QA)
+
 ### [2021-04-19 OpenCVDenoising项目为去燥函数fastNlMeansDenoising的使用](https://mp.weixin.qq.com/s/PU_fBawsG1Nfg74F5Pc0QA)
 
 ### [2021-04-12 OpenCVRemoveShadows项目为OpenCV图像去阴影](https://mp.weixin.qq.com/s/-Uzv-4Gk5p9fnrRpnuGvBg)
