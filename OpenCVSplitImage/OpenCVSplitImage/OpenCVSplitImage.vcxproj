@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{4eba6b32-0786-44bf-803c-31b0f0564d63}</ProjectGuid>
-    <RootNamespace>OpenCVRemoveShadows</RootNamespace>
+    <ProjectGuid>{d7047ea2-ec47-4fd9-9517-61488da713f2}</ProjectGuid>
+    <RootNamespace>OpenCVSplitImage</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

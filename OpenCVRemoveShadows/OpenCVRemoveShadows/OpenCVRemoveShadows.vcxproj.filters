@@ -18,12 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CvUtils.cpp">
+    <ClCompile Include="..\..\Utils\CvUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CvUtils.h">
+    <ClInclude Include="..\..\Utils\CvUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

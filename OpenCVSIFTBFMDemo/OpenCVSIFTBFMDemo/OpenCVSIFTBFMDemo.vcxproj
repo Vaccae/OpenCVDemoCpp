@@ -141,11 +141,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CvUtils.h" />
+    <ClCompile Include="..\..\Utils\CvUtils.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CvUtils.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="..\..\Utils\CvUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
