@@ -1,9 +1,11 @@
 # OpenCVDemoCpp
 使用C++编写的OpenCV的一些练习应用Demo，IDE使用的VS2019，OpenCV版本号为4.5.1
  
+### [2021-07-09 OpenCVPaddleOCRDemo调用使用PaddleOCR编译的动态库，识别OCR识别，CvUtils全部去掉using namespace](https://mp.weixin.qq.com/s/i5h3HPg0n39_vx8dD_EcqA)
+
 ### 2021-06-24 将CvUtils都整全到一个文件中，所有项目都直接调用当前CvUtils.h了，不再每个项目复制。
 
- ### [2021-06-24 C++ OpenCV检测并提取数字华容道棋盘](https://mp.weixin.qq.com/s/PU_fBawsG1Nfg74F5Pc0QA)
+ ### [2021-06-24 C++ OpenCV检测并提取数字华容道棋盘](https://mp.weixin.qq.com/s/i5h3HPg0n39_vx8dD_EcqA)
 
  ### [2021-05-21 OpenCVSIFTBFMDemo项目为OpenCV4.5版本SIFT特征提取及匹配](https://mp.weixin.qq.com/s/PU_fBawsG1Nfg74F5Pc0QA)
 

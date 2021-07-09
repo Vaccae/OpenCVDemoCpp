@@ -1,16 +1,16 @@
 #include "CvUtils.h"
 
-void CvUtils::SetShowWindow(Mat img, string winname, int pointx, int pointy)
+void CvUtils::SetShowWindow(cv::Mat img, std::string winname, int pointx, int pointy)
 {
 	//设置显示窗口
-	namedWindow(winname, WindowFlags::WINDOW_NORMAL);
+	cv::namedWindow(winname, cv::WindowFlags::WINDOW_NORMAL);
 	//设置图像显示大小
 	resizeWindow(winname, img.size());
 	//设置图像显示位置
-	moveWindow(winname, pointx, pointy);
+	cv::moveWindow(winname, pointx, pointy);
 }
 
-void CvUtils::MatResize(Mat& frame, int maxwidth, int maxheight)
+void CvUtils::MatResize(cv::Mat& frame, int maxwidth, int maxheight)
 {
 	double scale;
 	//判断图像是水平还是垂直
@@ -20,39 +20,39 @@ void CvUtils::MatResize(Mat& frame, int maxwidth, int maxheight)
 	if (isHorizontal) {
 		if (frame.cols > maxwidth) {
 			scale = (double)maxwidth / frame.cols;
-			resize(frame, frame, Size(0, 0), scale, scale);
+			resize(frame, frame, cv::Size(0, 0), scale, scale);
 		}
 	}
 	else {
 		if (frame.rows > maxheight) {
 			scale = (double)maxheight / frame.rows;
-			resize(frame, frame, Size(0, 0), scale, scale);
+			resize(frame, frame, cv::Size(0, 0), scale, scale);
 		}
 	}
 }
 
-vector<Point> CvUtils::Pt2fsToPts(vector<Point2f>& vecpt2f)
+std::vector<cv::Point> CvUtils::Pt2fsToPts(std::vector<cv::Point2f>& vecpt2f)
 {
-	vector<Point> vecpt;
-	for (Point2f item : vecpt2f) {
-		Point pt = item;
+	std::vector<cv::Point> vecpt;
+	for (cv::Point2f item : vecpt2f) {
+		cv::Point pt = item;
 		vecpt.push_back(pt);
 	}
 	return vecpt;
 }
 
-vector<Point2f> CvUtils::PtsToPt2fs(vector<Point>& vecpt)
+std::vector<cv::Point2f> CvUtils::PtsToPt2fs(std::vector<cv::Point>& vecpt)
 {
-	vector<Point2f> vecpt2f;
-	for (Point item : vecpt) {
-		Point2f pt = item;
+	std::vector<cv::Point2f> vecpt2f;
+	for (cv::Point item : vecpt) {
+		cv::Point2f pt = item;
 		vecpt2f.push_back(pt);
 	}
 	return vecpt2f;
 }
 
 //求Mat的中位数
-int CvUtils::GetMatMidVal(Mat& img)
+int CvUtils::GetMatMidVal(cv::Mat& img)
 {
 	//判断如果不是单通道直接返回128
 	if (img.channels() > 1) return 128;
@@ -80,7 +80,7 @@ int CvUtils::GetMatMidVal(Mat& img)
 }
 
 //使用大津法Mat的阈值
-int CvUtils::GetMatOTSU(Mat& img)
+int CvUtils::GetMatOTSU(cv::Mat& img)
 {
 	//判断如果不是单通道直接返回128
 	if (img.channels() > 1) return 128;
@@ -145,7 +145,7 @@ int CvUtils::GetMatOTSU(Mat& img)
 }
 
 //求自适应阈值的最小和最大值
-void CvUtils::GetMatMinMaxThreshold(Mat& img, int& minval, int& maxval, int calctype, float sigma)
+void CvUtils::GetMatMinMaxThreshold(cv::Mat& img, int& minval, int& maxval, int calctype, float sigma)
 {
 	int midval;
 	switch (calctype)
@@ -158,18 +158,18 @@ void CvUtils::GetMatMinMaxThreshold(Mat& img, int& minval, int& maxval, int calc
 		midval = GetMatMidVal(img);
 		break;
 	}
-	cout << "midval:" << midval << endl;
+	std::cout << "midval:" << midval << std::endl;
 	// 计算低阈值
-	minval = saturate_cast<uchar>((1.0 - sigma) * midval);
-	minval = saturate_cast<uchar>(midval / 2);
+	minval = cv::saturate_cast<uchar>((1.0 - sigma) * midval);
+	minval = cv::saturate_cast<uchar>(midval / 2);
 	//计算高阈值
-	maxval = saturate_cast<uchar>((1.0 + sigma) * midval);
-	maxval = saturate_cast<uchar>(midval);
+	maxval = cv::saturate_cast<uchar>((1.0 + sigma) * midval);
+	maxval = cv::saturate_cast<uchar>(midval);
 }
 
 
 //根据中心点找最远的四个点
-void CvUtils::GetRectPoints(Point2f vetPoints[], Point2f center, vector<Point> convex)
+void CvUtils::GetRectPoints(cv::Point2f vetPoints[], cv::Point2f center, std::vector<cv::Point> convex)
 {
 	//定义最远的4个点，0--左上， 1--右上， 2--右下  3--左下
 	float ltdist = 0.0f;  //左上的最大距离 
@@ -217,7 +217,7 @@ void CvUtils::GetRectPoints(Point2f vetPoints[], Point2f center, vector<Point> c
 
 //根据最小矩形点找最近的四边形点
 //第一参数为输出的点，第二个参数为矩形的4个点，第三个为多边形拟合的点 
-void CvUtils::GetPointsFromRect(Point2f vetPoints[], Point2f rectPoints[], vector<Point> convex)
+void CvUtils::GetPointsFromRect(cv::Point2f vetPoints[], cv::Point2f rectPoints[], std::vector<cv::Point> convex)
 {
 	//定义最远的4个点，0--左上， 1--右上， 2--右下  3--左下
 	float ltdist = 99999999.9f;  //左上的最大距离 
@@ -257,44 +257,44 @@ void CvUtils::GetPointsFromRect(Point2f vetPoints[], Point2f rectPoints[], vecto
 
 //重新计算距离变换的4个坐标点
 //思路：旋转矩形的点和上一步获取的临近点判断距离，如果小于阈值都列入，大于阈值按最近距离的阈值处理
-void CvUtils::GetPointsFromFitline(Point2f newPoints[], Point2f vetPoints[], Point2f rectPoints[], float dist)
+void CvUtils::GetPointsFromFitline(cv::Point2f newPoints[], cv::Point2f vetPoints[], cv::Point2f rectPoints[], float dist)
 {
 	//1.重新规划区域点
 	float curdist = CalcPointDistance(rectPoints[0], vetPoints[0]);
-	newPoints[0] = curdist <= dist ? rectPoints[0] : vetPoints[0] + Point2f(-dist, -dist);
+	newPoints[0] = curdist <= dist ? rectPoints[0] : vetPoints[0] + cv::Point2f(-dist, -dist);
 
 	curdist = CalcPointDistance(rectPoints[1], vetPoints[1]);
-	newPoints[1] = curdist <= dist ? rectPoints[1] : vetPoints[1] + Point2f(dist, -dist);
+	newPoints[1] = curdist <= dist ? rectPoints[1] : vetPoints[1] + cv::Point2f(dist, -dist);
 
 	curdist = CalcPointDistance(rectPoints[2], vetPoints[2]);
-	newPoints[2] = curdist <= dist ? rectPoints[2] : vetPoints[2] + Point2f(dist, dist);
+	newPoints[2] = curdist <= dist ? rectPoints[2] : vetPoints[2] + cv::Point2f(dist, dist);
 
 	curdist = CalcPointDistance(rectPoints[3], vetPoints[3]);
-	newPoints[3] = curdist <= dist ? rectPoints[3] : vetPoints[3] + Point2f(-dist, dist);
+	newPoints[3] = curdist <= dist ? rectPoints[3] : vetPoints[3] + cv::Point2f(-dist, dist);
 
 	//左侧区域点为最小旋转矩形的左上左下和离的最近的左上左下组成
-	vector<Point2f> lArea;
+	std::vector<cv::Point2f> lArea;
 	lArea.push_back(newPoints[0]);
 	lArea.push_back(vetPoints[0]);
 	lArea.push_back(vetPoints[3]);
 	lArea.push_back(newPoints[3]);
 
 	//顶部区域点为最小外接矩形左上右上和最近点的左上右上组成
-	vector<Point2f> tArea;
+	std::vector<cv::Point2f> tArea;
 	tArea.push_back(newPoints[0]);
 	tArea.push_back(newPoints[1]);
 	tArea.push_back(vetPoints[1]);
 	tArea.push_back(vetPoints[0]);
 
 	//右侧区域点为最近点的右上右下和最小外接矩形的右上和右下组成
-	vector<Point2f> rArea;
+	std::vector<cv::Point2f> rArea;
 	rArea.push_back(vetPoints[1]);
 	rArea.push_back(newPoints[1]);
 	rArea.push_back(newPoints[2]);
 	rArea.push_back(vetPoints[2]);
 
 	//底部区域点为最近点的左下右下和最小外接矩形的左下右下组成
-	vector<Point2f> bArea;
+	std::vector<cv::Point2f> bArea;
 	bArea.push_back(vetPoints[3]);
 	bArea.push_back(vetPoints[2]);
 	bArea.push_back(newPoints[2]);
@@ -302,17 +302,17 @@ void CvUtils::GetPointsFromFitline(Point2f newPoints[], Point2f vetPoints[], Poi
 
 	//2.根据区域做直线拟合
 	//左边区域
-	Vec4f lLine;
-	fitLine(lArea, lLine, DIST_L2, 0, 0.01, 0.01);
+	cv::Vec4f lLine;
+	fitLine(lArea, lLine, cv::DIST_L2, 0, 0.01, 0.01);
 	//顶部区域
-	Vec4f tLine;
-	fitLine(tArea, tLine, DIST_L2, 0, 0.01, 0.01);
+	cv::Vec4f tLine;
+	fitLine(tArea, tLine, cv::DIST_L2, 0, 0.01, 0.01);
 	//右边区域
-	Vec4f rLine;
-	fitLine(rArea, rLine, DIST_L2, 0, 0.01, 0.01);
+	cv::Vec4f rLine;
+	fitLine(rArea, rLine, cv::DIST_L2, 0, 0.01, 0.01);
 	//顶部区域
-	Vec4f bLine;
-	fitLine(bArea, bLine, DIST_L2, 0, 0.01, 0.01);
+	cv::Vec4f bLine;
+	fitLine(bArea, bLine, cv::DIST_L2, 0, 0.01, 0.01);
 
 	//3.根据直线拟合的求每两条直线的交叉点为我们的多边形顶点
 	//左上顶点
@@ -326,7 +326,7 @@ void CvUtils::GetPointsFromFitline(Point2f newPoints[], Point2f vetPoints[], Poi
 }
 
 //求两条直线的交叉点
-Point2f CvUtils::GetCrossPoint(Vec4f Line1, Vec4f Line2)
+cv::Point2f CvUtils::GetCrossPoint(cv::Vec4f Line1, cv::Vec4f Line2)
 {
 	double k1, k2;
 	//Line1的斜率
@@ -334,16 +334,16 @@ Point2f CvUtils::GetCrossPoint(Vec4f Line1, Vec4f Line2)
 	//Line2的斜率
 	k2 = Line2[1] / Line2[0];
 
-	Point2f crossPoint;
+	cv::Point2f crossPoint;
 	crossPoint.x = (k1 * Line1[2] - Line1[3] - k2 * Line2[2] + Line2[3]) / (k1 - k2);
 	crossPoint.y = (k1 * k2 * (Line1[2] - Line2[2]) + k1 * Line2[3] - k2 * Line1[3]) / (k1 - k2);
 	return crossPoint;
 }
 
-bool CvUtils::CheckRectBorder(Mat& img, RotatedRect rect)
+bool CvUtils::CheckRectBorder(cv::Mat& img, cv::RotatedRect rect)
 {
 	bool res = false;
-	Point2f pts[4];
+	cv::Point2f pts[4];
 	rect.points(pts);
 
 	for (auto item : pts) {
@@ -356,14 +356,14 @@ bool CvUtils::CheckRectBorder(Mat& img, RotatedRect rect)
 }
 
 //重新排序旋转矩形坐标点
-void CvUtils::SortRotatedRectPoints(Point2f vetPoints[], RotatedRect rect, int flag)
+void CvUtils::SortRotatedRectPoints(cv::Point2f vetPoints[], cv::RotatedRect rect, int flag)
 {
 	rect.points(vetPoints);
 
-	cout << vetPoints[0] << vetPoints[1] << vetPoints[2] << vetPoints[3] << endl;
-	cout << rect.angle << endl;
+	std::cout << vetPoints[0] << vetPoints[1] << vetPoints[2] << vetPoints[3] << std::endl;
+	std::cout << rect.angle << std::endl;
 
-	Point2f curpoint;
+	cv::Point2f curpoint;
 
 	if (flag == 0) {
 		//按X轴排序
@@ -421,10 +421,10 @@ void CvUtils::SortRotatedRectPoints(Point2f vetPoints[], RotatedRect rect, int f
 
 
 //计算两点间的距离
-float CvUtils::CalcPointDistance(Point2f point1, Point2f point2)
+float CvUtils::CalcPointDistance(cv::Point2f point1, cv::Point2f point2)
 {
 	//计算两个点的Point差值
-	Point2f tmppoint = point1 - point2;
+	cv::Point2f tmppoint = point1 - point2;
 	//利用欧几里德距离计算H
 	return sqrt(pow(tmppoint.x, 2) + pow(tmppoint.y, 2));
 }
