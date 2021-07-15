@@ -104,7 +104,7 @@ int CvUtils::GetMatOTSU(cv::Mat& img)
 	}
 
 	//大津法OTSU，前景与背景分割，计算出方差最大的灰度值
-	int calcval;
+	int calcval = -1;
 	int calcMax = 0;
 	for (int i = 0; i < 256; ++i) {
 		float w0 = 0, w1 = 0, u0tmp = 0, u1tmp = 0, u0 = 0, u1 = 0, u = 0, calctmp = 0;
@@ -427,4 +427,17 @@ float CvUtils::CalcPointDistance(cv::Point2f point1, cv::Point2f point2)
 	cv::Point2f tmppoint = point1 - point2;
 	//利用欧几里德距离计算H
 	return sqrt(pow(tmppoint.x, 2) + pow(tmppoint.y, 2));
+}
+
+//根据三个点计算夹角
+double CvUtils::CalcAngle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
+{
+	double dx1 = pt1.x - pt0.x;
+	double dy1 = pt1.y - pt0.y;
+	double dx2 = pt2.x - pt0.x;
+	double dy2 = pt2.y - pt0.y;
+
+	double cosine = (dx1 * dx2 + dy1 * dy2) / (sqrt(dx1 * dx1 + dy1 * dy1) * sqrt(dx2 * dx2 + dy2 * dy2) + 1e-10);
+
+	return cosine;
 }

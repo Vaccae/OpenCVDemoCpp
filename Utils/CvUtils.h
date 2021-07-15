@@ -55,5 +55,8 @@ public:
 
     //º∆À„æ‡¿Î
     static float CalcPointDistance(cv::Point2f point1, cv::Point2f point2);
+
+    //º∆À„º–Ω«
+    static double CalcAngle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 };
 

@@ -6,6 +6,7 @@
 #include <string>
 #include <locale>
 #include <codecvt>
+#include "..\..\Utils\CvUtils.h"
 
 class PaddleOcrApi
 {
@@ -14,6 +15,12 @@ private:
 
 public:
 	static std::string GetPaddleOCRText(cv::Mat& src);
+
+	//透视变换获取图像
+	static cv::Mat GetPerspectiveMat(cv::Mat& src, int iterations = 1);
+
+	//分割数据华容道图像
+	static std::vector<cv::Mat> GetNumMat(cv::Mat& src);
 
 	// string的编码方式为utf8，则采用：
 	static std::string wstr2utf8str(const std::wstring& str);
