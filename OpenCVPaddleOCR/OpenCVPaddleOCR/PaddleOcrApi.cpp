@@ -1,5 +1,44 @@
 #include "PaddleOcrApi.h"
 
+//二分查找定位当前插入序号
+int PaddleOcrApi::binarySearch(std::vector<std::pair<std::string, cv::Rect>>& vtsrect, const OCRTextRect rect)
+{
+	int left = 0;
+	int right = vtsrect.size() - 1;
+	int res = 0;
+
+	std::pair<std::string, cv::Rect> lastitem("", cv::Rect());
+
+	while (left <= right) {
+		int mid = left + (right - left) / 2;
+		//获取中位值
+		std::pair<std::string, cv::Rect> item(vtsrect[mid].first,vtsrect[mid].second);
+
+		//判断最后值是否相等
+		if (item.first == lastitem.first && item.second.x == lastitem.second.x
+			&& item.second.y == lastitem.second.y) {
+			res = mid;
+			break;
+		}
+		else if (rect.pty+rect.height > item.second.y + item.second.height / 2) {
+			lastitem.first = item.first;
+			lastitem.second = item.second;
+			left = mid + 1;
+		}
+		else if (rect.ptx < item.second.x) {
+			lastitem.first = item.first;
+			lastitem.second = item.second;
+			right = mid - 1;
+		}
+		else if (rect.ptx >= item.second.x) {
+			lastitem.first = item.first;
+			lastitem.second = item.second;
+			left = mid + 1;
+		}
+	}
+
+	return res;
+}
 
 std::string PaddleOcrApi::GetPaddleOCRText(cv::Mat& src)
 {
@@ -41,6 +80,75 @@ std::string PaddleOcrApi::GetPaddleOCRText(cv::Mat& src)
 	}
 
 	return resstr;
+}
+
+std::string PaddleOcrApi::GetPaddleOCRTextRect(cv::Mat& src, std::vector<std::pair<std::string, cv::Rect>>& vtsocr)
+{
+	std::string resstr;
+	DllFunOCRTextRect funName;
+	HINSTANCE hdll;
+
+	try
+	{
+		hdll = LoadLibrary(L"PaddleOCRExport.dll");
+		if (hdll == NULL)
+		{
+			resstr = "加载不到PaddleOCRExport.dll动态库！";
+			FreeLibrary(hdll);
+			return resstr;
+		}
+
+		funName = (DllFunOCRTextRect)GetProcAddress(hdll, "PaddleOCRTextRect");
+		if (funName == NULL)
+		{
+			resstr = "找不到PaddleOCRText函数！";
+			FreeLibrary(hdll);
+			return resstr;
+		}
+
+		OCRTextRect vts[100];
+
+		int count = funName(src, vts);
+
+		std::cout << "size:" << std::to_string(count) << std::endl;
+		
+		for (int i = 0; i< count; ++i) {
+			std::cout << vts[i].OCRText<< std::endl;
+			std::cout << "Rect:x=" << std::to_string(vts[i].ptx);
+			std::cout << " y=" << std::to_string(vts[i].pty);
+			std::cout << " width=" << std::to_string(vts[i].width);
+			std::cout << " height=" << std::to_string(vts[i].height) << std::endl;
+
+			OCRTextRect tmprect = vts[i];
+		    // 将utf-8的string转换为wstring
+			std::wstring wtxt = utf8str2wstr(tmprect.OCRText);
+			// 再将wstring转换为gbk的string
+			std::string tmpstr = wstr2str(wtxt, "Chinese");
+
+			// 通过二分查找排序插入到vtsocr的容器中
+			int index = binarySearch(vtsocr, vts[i]);
+			vtsocr.insert(vtsocr.begin() + index, std::pair<std::string, cv::Rect>(tmpstr,
+				cv::Rect(tmprect.ptx, tmprect.pty, tmprect.width, tmprect.height)));
+		}
+		resstr = "OK";
+
+		FreeLibrary(hdll);
+	}
+	catch (const std::exception& ex)
+	{
+		resstr = ex.what();
+		return "Error:" + resstr;
+		FreeLibrary(hdll);
+	}
+	return resstr;
+}
+
+//排序OCRTextRect
+std::vector<std::pair<std::string, cv::Rect>> PaddleOcrApi::SortRectPair(const OCRTextRect* vtsrect, const int count)
+{
+	std::vector<std::pair<std::string, cv::Rect>> resvts;
+
+	return std::vector<std::pair<std::string, cv::Rect>>();
 }
 
 cv::Mat PaddleOcrApi::GetPerspectiveMat(cv::Mat& src, int iterations)
@@ -301,84 +409,6 @@ std::vector<cv::Mat> PaddleOcrApi::GetNumMat(cv::Mat& src)
 
 	return vts;
 }
-//std::vector<cv::Mat> PaddleOcrApi::GetNumMat(cv::Mat& src)
-//{
-//    std::vector<cv::Mat> vts;
-//    cv::Mat tmpsrc,tmpgray,threshsrc;
-//    src.copyTo(tmpsrc);
-//
-//    cv::GaussianBlur(tmpsrc, tmpsrc, cv::Size(3, 3), 0.5, 0.5);
-//
-//    cv::cvtColor(tmpsrc, tmpgray, cv::COLOR_BGR2GRAY);
-//
-//    cv::equalizeHist(tmpgray, tmpgray);
-//
-//    //二值化
-//    //cv::threshold(tmpgray, threshsrc, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-//
-//    //int minthreshold = 120, maxthreshold = 200;
-//    ////大津法求阈值
-//    //CvUtils::GetMatMinMaxThreshold(tmpgray, minthreshold, maxthreshold, 1);
-//    //std::cout << "OTSUmin:" << minthreshold << "  OTSUmax:" << maxthreshold << std::endl;
-//    ////Canny边缘提取
-//    Canny(tmpgray, threshsrc, 0, 255);
-//
-//    CvUtils::SetShowWindow(threshsrc, "threshsrc", 700, 20);
-//    cv::imshow("threshsrc", threshsrc);
-//
-//
-//    //std::vector<std::vector<cv::Point>> contours;
-//    //std::vector<cv::Vec4i> hierarchy;
-//    //findContours(threshsrc, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-//    ////定义拟合后的多边形数组
-//    //std::vector<std::vector<cv::Point>> vtshulls;
-//
-//    //for (int i = 0; i < contours.size(); ++i) {
-//    //    //判断轮廓形状，不是四边形的忽略掉
-//    //    double lensval = 0.01 * arcLength(contours[i], true);
-//    //    std::vector<cv::Point> convexhull;
-//    //    approxPolyDP(cv::Mat(contours[i]), convexhull, lensval, true);
-//
-//    //    //不是四边形的过滤掉
-//    //    if (convexhull.size() != 4) continue;
-//
-//    //    vtshulls.push_back(convexhull);
-//    //}
-//
-//    //for (int i = 0; i < vtshulls.size(); ++i) {
-//    //    cv::drawContours(tmpsrc, vtshulls, i, cv::Scalar(0, 0, 255));
-//    //}
-//
-//
-//    std::vector<cv::Vec4f> lines;
-//    cv::HoughLinesP(threshsrc, lines, 1, CV_PI / 180.0, 200, 100, 40);
-//
-//    cv::Scalar color = cv::Scalar(0, 0, 255);
-//    for (int i = 0; i < lines.size(); ++i) {
-//        cv::Vec4f line = lines[i];
-//        cv::putText(tmpsrc, std::to_string(i), cv::Point(line[0], line[1]), 1, 1, color);
-//        cv::line(tmpsrc, cv::Point(line[0], line[1]), cv::Point(line[2], line[3]), color);
-//    }
-//    CvUtils::SetShowWindow(tmpsrc, "tmpsrc", 700, 20);
-//    cv::imshow("tmpsrc", tmpsrc);
-//
-//    //开运算
-//    //cv::Mat morph1, morph2, morphcalc;
-//    //cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
-//    //cv::morphologyEx(threshsrc, morph1, cv::MORPH_ELLIPSE, kernel);
-//    //CvUtils::SetShowWindow(morph1, "morph1", 500, 20);
-//    //cv::imshow("morph1", morph1);
-//
-//    //cv::morphologyEx(threshsrc, morph2, cv::MORPH_TOPHAT, kernel);
-//    //CvUtils::SetShowWindow(morph2, "morph2", 500, 20);
-//    //cv::imshow("morph2", morph2);
-//
-//    //morphcalc = threshsrc - morph2;
-//    //CvUtils::SetShowWindow(morphcalc, "morphcalc", 500, 20);
-//    //cv::imshow("morphcalc", morphcalc);
-//
-//    return vts;
-//}
 
 std::string PaddleOcrApi::wstr2utf8str(const std::wstring& str)
 {

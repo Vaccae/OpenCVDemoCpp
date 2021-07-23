@@ -8,14 +8,38 @@
 #include <codecvt>
 #include "..\..\Utils\CvUtils.h"
 
+struct OCRTextRect {
+public:
+	char* OCRText;  //识别的信息
+	int ptx, pty;       //Rect的起始坐标
+	int width, height;  //Rect的宽和高
+
+	OCRTextRect() {
+		OCRText = nullptr;
+		ptx = 0;
+		pty = 0;
+		width = 0;
+		height = 0;
+	}
+};
+
 class PaddleOcrApi
 {
 private:
 	typedef char*(*DllFun)(cv::Mat&);
 
+	typedef int (*DllFunOCRTextRect)(cv::Mat&, OCRTextRect*);
+
+	//二分查找
+	static int binarySearch(std::vector<std::pair<std::string, cv::Rect>>& vtsrect, const OCRTextRect rect);
+
 public:
 	static std::string GetPaddleOCRText(cv::Mat& src);
 
+	static std::string GetPaddleOCRTextRect(cv::Mat& src, std::vector<std::pair<std::string, cv::Rect>>& vtsocr);
+
+	//排序OCRTextRect转为vector容器
+	static std::vector<std::pair<std::string, cv::Rect>> SortRectPair(const OCRTextRect* vtsrect, const int count);
 	//透视变换获取图像
 	static cv::Mat GetPerspectiveMat(cv::Mat& src, int iterations = 1);
 

@@ -92,7 +92,7 @@ void CRNNRecognizer::Run(std::vector<std::vector<std::vector<int>>> boxes,
   }
 }
 
-std::vector<std::string> CRNNRecognizer::RunOCR(std::vector<std::vector<std::vector<int>>> boxes, cv::Mat& img, Classifier* cls)
+std::vector<std::pair<std::string, cv::Rect>> CRNNRecognizer::RunOCR(std::vector<std::vector<std::vector<int>>> boxes, cv::Mat& img, Classifier* cls)
 {
     cv::Mat srcimg;
     img.copyTo(srcimg);
@@ -101,9 +101,11 @@ std::vector<std::string> CRNNRecognizer::RunOCR(std::vector<std::vector<std::vec
 
     std::cout << "The predicted text is :" << std::endl;
     int index = 0;
+    std::vector<std::pair<std::string, cv::Rect>> vtsresstr;
     std::vector<std::string> str_res;
+    cv::Rect tmprect;
     for (int i = 0; i < boxes.size(); i++) {
-        crop_img = GetRotateCropImage(srcimg, boxes[i]);
+        crop_img = GetRotateCropImage(srcimg, boxes[i], tmprect);
 
         if (cls != nullptr) {
             crop_img = cls->Run(crop_img);
@@ -161,12 +163,23 @@ std::vector<std::string> CRNNRecognizer::RunOCR(std::vector<std::vector<std::vec
             last_index = argmax_idx;
         }
         score /= count;
-        for (int i = 0; i < str_res.size(); i++) {
-            std::cout << str_res[i];
+        cv::String tmpstr;
+        //for (int i = 0; i < str_res.size(); i++) {
+        //    tmpstr += str_res[i];
+        //    std::cout << tmpstr;
+        //}
+        for (int i = index; i < str_res.size(); i++) {
+            tmpstr += str_res[i];
+            std::cout << tmpstr;
         }
+        index = str_res.size();
         std::cout << "\tscore: " << score << std::endl;
+        std::pair<std::string, cv::Rect> tmppair;
+        tmppair.first = tmpstr;
+        tmppair.second = tmprect;
+        vtsresstr.push_back(tmppair);
     }
-    return str_res;
+    return vtsresstr;
 }
 
 void CRNNRecognizer::LoadModel(const std::string &model_dir) {
@@ -259,6 +272,63 @@ cv::Mat CRNNRecognizer::GetRotateCropImage(const cv::Mat &srcimage,
   } else {
     return dst_img;
   }
+}
+
+cv::Mat CRNNRecognizer::GetRotateCropImage(const cv::Mat& srcimage, std::vector<std::vector<int>> box, cv::Rect& rect)
+{
+    cv::Mat image;
+    srcimage.copyTo(image);
+    std::vector<std::vector<int>> points = box;
+
+    int x_collect[4] = { box[0][0], box[1][0], box[2][0], box[3][0] };
+    int y_collect[4] = { box[0][1], box[1][1], box[2][1], box[3][1] };
+    int left = int(*std::min_element(x_collect, x_collect + 4));
+    int right = int(*std::max_element(x_collect, x_collect + 4));
+    int top = int(*std::min_element(y_collect, y_collect + 4));
+    int bottom = int(*std::max_element(y_collect, y_collect + 4));
+
+    cv::Mat img_crop;
+    rect = cv::Rect(left, top, right - left, bottom - top);
+    image(rect).copyTo(img_crop);
+
+    for (int i = 0; i < points.size(); i++) {
+        points[i][0] -= left;
+        points[i][1] -= top;
+    }
+
+    int img_crop_width = int(sqrt(pow(points[0][0] - points[1][0], 2) +
+        pow(points[0][1] - points[1][1], 2)));
+    int img_crop_height = int(sqrt(pow(points[0][0] - points[3][0], 2) +
+        pow(points[0][1] - points[3][1], 2)));
+
+    cv::Point2f pts_std[4];
+    pts_std[0] = cv::Point2f(0., 0.);
+    pts_std[1] = cv::Point2f(img_crop_width, 0.);
+    pts_std[2] = cv::Point2f(img_crop_width, img_crop_height);
+    pts_std[3] = cv::Point2f(0.f, img_crop_height);
+
+    cv::Point2f pointsf[4];
+    pointsf[0] = cv::Point2f(points[0][0], points[0][1]);
+    pointsf[1] = cv::Point2f(points[1][0], points[1][1]);
+    pointsf[2] = cv::Point2f(points[2][0], points[2][1]);
+    pointsf[3] = cv::Point2f(points[3][0], points[3][1]);
+
+    cv::Mat M = cv::getPerspectiveTransform(pointsf, pts_std);
+
+    cv::Mat dst_img;
+    cv::warpPerspective(img_crop, dst_img, M,
+        cv::Size(img_crop_width, img_crop_height),
+        cv::BORDER_REPLICATE);
+
+    if (float(dst_img.rows) >= float(dst_img.cols) * 1.5) {
+        cv::Mat srcCopy = cv::Mat(dst_img.rows, dst_img.cols, dst_img.depth());
+        cv::transpose(dst_img, srcCopy);
+        cv::flip(srcCopy, srcCopy, 0);
+        return srcCopy;
+    }
+    else {
+        return dst_img;
+    }
 }
 
 } // namespace PaddleOCR

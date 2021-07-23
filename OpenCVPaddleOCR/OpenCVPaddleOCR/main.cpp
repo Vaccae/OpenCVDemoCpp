@@ -55,14 +55,32 @@ int main(int argc, char** argv) {
 			cv::imshow("resimg", tmpsrc);
 
 			//使用PaddleOCR识别
-			std::string resstr = PaddleOcrApi::GetPaddleOCRText(resultMat);
-			std::cout << "OCR:" << resstr << std::endl;
+			//std::string resstr = PaddleOcrApi::GetPaddleOCRText(resultMat);
+			//std::cout << "OCR:" << resstr << std::endl;
+
+			std::vector<std::pair<std::string, cv::Rect>> vtsocrs;
+			PaddleOcrApi::GetPaddleOCRTextRect(resultMat, vtsocrs);
 
 			//输出识别文字
-			if (!resultMat.empty()) {
-				putText::putTextZH(resultMat, resstr.data(), cv::Point(20, 20), cv::Scalar(0, 0, 255), 1);
-				cv::putText(resultMat, resstr, cv::Point(20, 50), 1, 1, cv::Scalar(0, 0, 255));
+			//if (!resultMat.empty()) {
+			//	putText::putTextZH(resultMat, resstr.data(), cv::Point(20, 20), cv::Scalar(0, 0, 255), 1);
+			//	cv::putText(resultMat, resstr, cv::Point(20, 50), 1, 1, cv::Scalar(0, 0, 255));
+			//}
+			std::cout << "输出：" << std::endl;
+			for (int i = 0; i < vtsocrs.size(); ++i) {
+				int B = cv::theRNG().uniform(0, 255);
+				int G = cv::theRNG().uniform(0, 255);
+				int R = cv::theRNG().uniform(0, 255);
+
+				cv::Rect tmprect = vtsocrs[i].second;
+				std::string tmptext = "N" + std::to_string(i) + ":" + vtsocrs[i].first;
+				cv::Point pt = cv::Point(tmprect.x,	tmprect.y);
+				cv::rectangle(resultMat, tmprect, cv::Scalar(B, G, R));
+				cv::putText(resultMat, tmptext, pt, 1, 1.2, cv::Scalar(B, G, R));
+
+				std::cout << tmptext << std::endl;
 			}
+
 
 			CvUtils::SetShowWindow(resultMat, "cutMat", 600, 20);
 			cv::imshow("cutMat", resultMat);

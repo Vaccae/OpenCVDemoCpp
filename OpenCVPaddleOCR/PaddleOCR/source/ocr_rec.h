@@ -65,7 +65,7 @@ public:
   void Run(std::vector<std::vector<std::vector<int>>> boxes, cv::Mat &img,
            Classifier *cls);
 
-  std::vector<std::string> RunOCR(std::vector<std::vector<std::vector<int>>> boxes, cv::Mat& img,
+  std::vector<std::pair<std::string, cv::Rect>> RunOCR(std::vector<std::vector<std::vector<int>>> boxes, cv::Mat& img,
       Classifier* cls);
 
 private:
@@ -94,6 +94,9 @@ private:
 
   cv::Mat GetRotateCropImage(const cv::Mat &srcimage,
                              std::vector<std::vector<int>> box);
+
+  cv::Mat GetRotateCropImage(const cv::Mat& srcimage,
+      std::vector<std::vector<int>> box, cv::Rect& rect);
 
 }; // class CrnnRecognizer
 
