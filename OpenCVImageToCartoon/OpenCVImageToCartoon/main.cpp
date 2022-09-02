@@ -11,7 +11,7 @@ void PencilSketchToCartoon(Mat frame);
 
 int main(int agrc, char** argv) {
 
-	Mat src = imread("E:/DCIM/person/song5.jpg");
+	Mat src = imread("E:/Family/me/2021过年1.jpg");
 
 	//自动设置图像显示大小
 	CvUtils::MatResize(src);
@@ -90,7 +90,7 @@ void StylizationToCartoon(Mat frame)
 	double t1 = (double)getTickCount();
 
 	Mat dststyle;
-	stylization(frame, dststyle, 100, 0.4);
+	stylization(frame, dststyle, 100, 0.7);
 	//显示图像
 	CvUtils::SetShowWindow(dststyle, "dststyle", 630, 50);
 	imshow("dststyle", dststyle);

@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-	Mat src = imread("E:/DCIM/Test_image.jpg");
+	Mat src = imread("E:/DCIM/ryb/fx3w.bmp");
 	//因为图片是纵向的，所以前面800的参数作用不大，主要是为了限制高度可以三张图片都显示出来
 	CvUtils::MatResize(src, 800, 520);
 	//imshow("src", src);
@@ -25,12 +25,12 @@ int main(int argc, char** argv) {
 	//2.将灰度图进行膨胀操作
 	Mat dilateMat;
 	morphologyEx(gray, dilateMat, MORPH_DILATE, element, Point(-1, -1), iteration);
-	//imshow("dilate", dilateMat);
+	imshow("dilate", dilateMat);
 
 	//3.将膨胀后的图再进行腐蚀
 	Mat erodeMat;
 	morphologyEx(dilateMat, erodeMat, MORPH_ERODE, element, Point(-1, -1), iteration);
-	//imshow("erode", erodeMat);
+	imshow("erode", erodeMat);
 
 	//4.膨胀再腐蚀后的图减去原灰度图再进行取反操作
 	Mat calcMat = ~(erodeMat - gray);
@@ -39,10 +39,10 @@ int main(int argc, char** argv) {
 
 	//5.使用规一化将原来背景白色的改了和原来灰度图差不多的灰色
 	Mat removeShadowMat;
-	normalize(calcMat, removeShadowMat, 0, 200, NORM_MINMAX);
-	CvUtils::SetShowWindow(removeShadowMat, "dst", 
+	//normalize(calcMat, removeShadowMat, 0, 200, NORM_MINMAX);
+	CvUtils::SetShowWindow(calcMat, "dst",
 		gray.cols, 30);
-	imshow("dst", removeShadowMat);
+	imshow("dst", calcMat);
 
 
 	waitKey(0);
