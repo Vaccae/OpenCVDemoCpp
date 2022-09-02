@@ -19,7 +19,7 @@ string rgb2hex(int r, int g, int b, bool ishead = false);
 
 int main(int argc, char** argv) {
 
-	src = imread("E:/DCIM/6.jpg");
+	src = imread("E:/DCIM/6.jpg");   
 	CvUtils::MatResize(src);
 	CvUtils::SetShowWindow(src, showsrc, 500, 20);
 	imshow(showsrc, src);

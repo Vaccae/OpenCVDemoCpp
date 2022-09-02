@@ -1,7 +1,7 @@
 # OpenCVDemoCpp
 使用C++编写的OpenCV的一些练习应用Demo，IDE使用的VS2022，OpenCV版本号为4.5.1
  
-### [2022-09-05  OpenCVRGBExtract做的一个简单的颜色提取器](https://api.yiban.io/draft/190796954484/0_Do8YCc45pJsqYPT1vpUv9lV6-m9D7Pcgoe-KhtM3ME0mvVmT6-JED1e15Ktc9RhY)
+### [2022-09-05  OpenCVRGBExtract做的一个简单的颜色提取器](https://api.yiban.io/draft/190796954484/0_Do8YCc45pJsqYPT1vpUv9lV6-m9D7Pcgoe-KhtM3ME0mvVmT6-JED1e15Ktc9RhY) 
 
 ### [2021-07-23  OpenCVPaddleOCRDemo动态库返回识别结果及矩形位置](https://mp.weixin.qq.com/s/i5h3HPg0n39_vx8dD_EcqA)
 
