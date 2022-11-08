@@ -1,6 +1,8 @@
 # OpenCVDemoCpp
 使用C++编写的OpenCV的一些练习应用Demo，IDE使用的VS2022，OpenCV版本号为4.5.1
 
+### [2022-11-08  OpenCVpyTorchDNN超简单pyTorch训练模型导出onnx，OpenCV DNN实现推理](https://mp.weixin.qq.com/s/6OufT_ZMQEn3kSwv_pZ2OQ)  
+
 ### [2022-09-16  OpenCVPerspectiveDemo手动截取位置做透视变换](https://mp.weixin.qq.com/s/6OufT_ZMQEn3kSwv_pZ2OQ)  
 
 ### [2022-09-05  OpenCVRGBExtract做的一个简单的颜色提取器](https://mp.weixin.qq.com/s/6OufT_ZMQEn3kSwv_pZ2OQ) 
